@@ -1,6 +1,6 @@
 from django.urls import path
-from .views import rate_haiku
+from haikujudge import views
 
 urlpatterns = [
-    path('rate-haiku/', rate_haiku, name='rate_haiku'),
+    path('haikujudge/', views.haiku_judge),
 ]

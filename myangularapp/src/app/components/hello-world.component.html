@@ -1,0 +1,13 @@
+<div class="flex flex-col justify-center items-center h-screen">
+    <h1 class="text-3xl font-bold underline mb-4">
+        {{ message }}
+    </h1>
+    <textarea [(ngModel)]="content" rows="3" class="border p-2 mb-4" placeholder="Enter your Haiku here..."></textarea>
+    <textarea [(ngModel)]="author" rows="1" class="border p-2 mb-4" placeholder="Sign here..."></textarea>
+    <button (click)="submitHaiku()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+        Submit Haiku
+    </button>
+    <div *ngIf="score !== null" class="mt-4">
+        <h2 class="text-2xl font-bold">Your Haiku Score: {{ score }}</h2>
+    </div>
+</div>
