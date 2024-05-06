@@ -22,7 +22,7 @@ export class HelloWorldComponent {
     constructor(private http: HttpClient) {}
 
     submitHaiku(): void {
-        this.http.post('http://127.0.0.1:8080/api/haikujudge/', { 
+        this.http.post('https://haiku-best.onrender.com/api/haikujudge/', { 
             content: this.content,
             author: this.author,
             score: this.score

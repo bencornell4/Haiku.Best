@@ -17,6 +17,10 @@ llama = LlamaAPI(config('LLAMA_API'))
 
 # Create your views here.
 
+@api_view(['HEAD'])
+def haiku_head():
+    return JsonResponse({'success': True}, status=201)
+
 @api_view(['POST'])
 def haiku_judge(request):
     #extract haiku
