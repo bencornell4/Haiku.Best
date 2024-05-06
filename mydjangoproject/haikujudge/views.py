@@ -10,6 +10,11 @@ from haikujudge.models import Haiku
 from haikujudge.serializers import HaikuSerializer
 from rest_framework.decorators import api_view
 
+from llamaapi import LlamaAPI
+from decouple import config
+
+llama = LlamaAPI(config('LLAMA_API'))
+
 # Create your views here.
 
 @api_view(['POST'])
@@ -27,21 +32,24 @@ def haiku_judge(request):
         accuracy = 1
         haiku_category = "Haiku"
         #prompt
-        prompt = 'Rate the following Haiku on a scale of 0-10, please only respond with the number and nothing else.  You may use decimals, for example 1.2 or 0.0.  A category will also be supplied that the Haiku should somewhat adhere to.  The Haiku must have syllable counts in the 5-7-5 pattern.  Do your best to be as consistent as possible so that if I were to give you this Haiku again, you would give it the same score.  Please rate critically because only a truly amazing Haiku should get a high score.  Lastly, here is a rubric: 0-3: does not follow the category or does not have the correct syllable count.  3-5: a below average piece of poetry, about as good as poems found in a highschool poetry class. 5-7: passable poetry, about as good as poems found in a college poetry class.  7-9: a poem that could be published.  9-10: as good as any poem ever written, maybe better. Thank you in advance for your rating. The category of the Haiku is: ' + haiku_category + ' And the Haiku is: ' + haiku_content
+        prompt_instructions = 'Rate the following Haiku on a scale of 0-10, please only respond with the number and nothing else.  You may use decimals, for example 1.2 or 0.0.  A category will also be supplied that the Haiku should somewhat adhere to.  The Haiku must have syllable counts in the 5-7-5 pattern.  Do your best to be as consistent as possible so that if I were to give you this Haiku again, you would give it the same score.  Please rate critically because only a truly amazing Haiku should get a high score.  Lastly, here is a rubric: 0-3: does not follow the category or does not have the correct syllable count.  3-5: a below average piece of poetry, about as good as poems found in a highschool poetry class. 5-7: passable poetry, about as good as poems found in a college poetry class.  7-9: a poem that could be published.  9-10: as good as any poem ever written, maybe better. Thank you in advance for your rating. The category of the Haiku is: ' + haiku_category
+        prompt_haiku = 'And the Haiku is: ' + haiku_content
         #initialize ollama post
         sum = 0
-        ollamaUrl = 'http://localhost:11434/api/generate'
-        postData = {
-            'prompt': prompt,
-            'model': 'llama3',
+        llama_request_json = {
+            'model': 'llama3-70b',
+            'messages': [
+                {'role': 'system', 'content': prompt_instructions},
+                {'role': 'user', 'content': prompt_haiku},
+            ],
             'stream': False
         }
         #run multiple times and average for consistency
         for i in range(accuracy):
             #post to ollama
-            llmResponse = requests.post(ollamaUrl, data=json.dumps(postData))
-            result = llmResponse.json()
-            sum += float(result['response'])
+            llama_response = llama.run(llama_request_json)
+            result = llama_response.json()
+            sum += float(result['choices'][0]['message']['content'])
         #create postgreSQL entry
         haiku = Haiku.objects.create(content=haiku_content, score=sum / accuracy, author=author)
         print('Successfully reviewed poem: ' + str(haiku.score))
