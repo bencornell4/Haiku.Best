@@ -1,14 +1,17 @@
 import json
 import requests
-from django.shortcuts import render
 
-from django.http.response import JsonResponse
+from django.shortcuts import render
+from django.utils import timezone
+from django.core.serializers.json import DjangoJSONEncoder
+
 from rest_framework import status
 from rest_framework.parsers import JSONParser
 
 from haikujudge.models import Haiku
 from haikujudge.serializers import HaikuSerializer
 from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
 from llamaapi import LlamaAPI
 from decouple import config
@@ -18,18 +21,27 @@ llama = LlamaAPI(config('LLAMA_API'))
 # Create your views here.
 
 @api_view(['HEAD'])
-def haiku_head():
-    return JsonResponse({'success': True}, status=201)
+def haiku_head(request):
+    return Response({'success': True}, status=201)
+
+@api_view(['GET'])
+def haiku_top(request):
+    top_models = Haiku.objects.order_by('-score')[:3]
+    serializer = HaikuSerializer(top_models, many=True)
+    return Response(serializer.data)
 
 @api_view(['POST'])
 def haiku_judge(request):
+    # Check if the action has already been performed today
+    last_action_date = request.session.get('last_haiku_judge_date', None)
+    print(last_action_date)
+    print(timezone.localdate())
+    if last_action_date and last_action_date == timezone.localdate().isoformat():
+        return Response({'message': 'one haiku a day'}, status=201)
     #extract haiku
     data = JSONParser().parse(request)
     haiku_serializer = HaikuSerializer(data=data)
     if haiku_serializer.is_valid():
-        #find out waht this does
-        haiku_serializer.save()
-        #this isnt right
         haiku_content = haiku_serializer.validated_data.get('content', '')
         author = haiku_serializer.validated_data.get('author', '')            
         #params
@@ -58,6 +70,7 @@ def haiku_judge(request):
         #create postgreSQL entry
         haiku = Haiku.objects.create(content=haiku_content, score=sum / accuracy, author=author)
         print('Successfully reviewed poem: ' + str(haiku.score))
-        return JsonResponse({'score': haiku.score}, status=201)
-    return JsonResponse({'error': 'Invalid JSON'}, status=400)
-        
+        request.session['last_haiku_judge_date'] = timezone.localdate().isoformat()
+        request.session.save()
+        return Response({'score': haiku.score}, status=201)
+    return Response({'error': 'Invalid JSON'}, status=400)

@@ -12,9 +12,9 @@
     "lib": ["es2020", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
-    "baseUrl": ".",
+    "baseUrl": "src",
     "paths": {
-      "@components/*": ["src/app/components/*"]
+      "@components/*": ["./app/components/*"],
     },
     "useDefineForClassFields": false,
     "esModuleInterop": true,

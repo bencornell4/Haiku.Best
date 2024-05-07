@@ -1,5 +1,5 @@
-import { CUSTOM_ELEMENTS_SCHEMA, Component } from '@angular/core';
-import { HelloWorldComponent } from '@components/hello-world.component';
+import { Component } from '@angular/core';
+import { HaikuWriteComponent } from '@components/haiku-write.component';
 import { RouterModule } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
 
@@ -9,11 +9,11 @@ import { HttpClientModule } from '@angular/common/http';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
   imports: [
-    HelloWorldComponent, 
+    HaikuWriteComponent, 
     RouterModule, 
-    HttpClientModule, 
+    HttpClientModule,
   ],
 })
 export class AppComponent {
-  title = 'myreactapp';
+  title = 'haiku.best';
 }
