@@ -1,4 +1,4 @@
-import { Component, ViewChild, ElementRef, Injectable } from "@angular/core";
+import { Component, ViewChild, ElementRef, Injectable, isDevMode } from "@angular/core";
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from "@angular/common/http";
 import { CommonModule } from '@angular/common';
@@ -27,7 +27,11 @@ export class HelloWorldComponent {
     constructor(private http: HttpClient) {}
 
     submitHaiku(): void {
-        this.http.post('http://localhost:8000/api/judgehaiku', { 
+        var serverUrl = 'https://haiku-best.onrender.com/api/haikujudge/'
+        if (isDevMode()) {
+            serverUrl = 'http://localhost:8000/api/haikujudge/'
+        }
+        this.http.post(serverUrl, {
             content: this.line1 + ", " + this.line2 + ", " + this.line3,
             author: this.author,
             score: this.score
