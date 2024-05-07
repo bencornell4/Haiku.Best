@@ -1,13 +1,36 @@
-<div class="flex flex-col justify-center items-center h-screen">
-    <h1 class="text-3xl font-bold underline mb-4">
-        {{ message }}
-    </h1>
-    <textarea [(ngModel)]="content" rows="3" class="border p-2 mb-4" placeholder="Enter your Haiku here..."></textarea>
-    <textarea [(ngModel)]="author" rows="1" class="border p-2 mb-4" placeholder="Sign here..."></textarea>
-    <button (click)="submitHaiku()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-        Submit Haiku
-    </button>
-    <div *ngIf="score !== null" class="mt-4">
-        <h2 class="text-2xl font-bold">Your Haiku Score: {{ score }}</h2>
+<div class="overflow-hidden h-screen">
+    <div class="flex justify-between items-center px-4 h-16 top-0 left-0 mx-auto container">
+        <div class="flex items-center">
+            <ng-icon class="text-3xl inline-flex mx-2" name="heroBars3"></ng-icon>
+            <h2 class="text-xl *:inline-flex mx-2">haiku.best</h2>
+        </div>
+        <div>
+            <ng-icon class="text-3xl mx-2" name="heroQuestionMarkCircle"></ng-icon>
+            <ng-icon class="text-3xl mx-2" name="heroTrophy"></ng-icon>
+            <ng-icon class="text-3xl mx-2" name="heroCog6Tooth"></ng-icon>
+        </div>
+    </div>
+    <div class="flex flex-col mt-20 justify-center items-center">
+        <textarea [(ngModel)]="line1" rows="1" class="border p-2 mb-4 mt-4 text-center" placeholder="First Line"></textarea>
+        <textarea [(ngModel)]="line2" rows="1" class="border p-2 mb-4 text-center" placeholder="Second Line"></textarea>
+        <textarea [(ngModel)]="line3" rows="1" class="border p-2 mb-4 text-center" placeholder="Third Line"></textarea>
+        <button (click)="submitHaiku()" class="bg--500 bg-indigo-400 hover:bg-indigo-500 text-white font-bold py-2 px-4 mt-10 rounded">
+            Submit Haiku
+        </button>
+        <textarea [(ngModel)]="author" rows="1" class="border p-2 mb-4 mt-4 text-center" placeholder="Your Signature"></textarea>
+        
+        <dialog closed class="w-[70%] m-auto bg-slate-400 rounded-md" #scoreDialog>
+            <button (click)="scoreDialog.open = false" title="close-score">
+                <ng-icon class="absolute text-white text-2xl m-2 right-0 top-0" name="heroXCircle"></ng-icon>
+            </button>
+            <div *ngIf="score !== null" class="flex=col mt-4">
+                <p class="text-white text-center m-auto mt-10">the judge has given you a</p>
+                <h2 class="text-xl font-bold mt-4 text-white text-center m-auto">{{ score }} / 10</h2>
+                <div class="flex justify-center mt-14 pb-10">
+                    <ng-icon class="text-3xl text-white mx-2" name="heroShare"></ng-icon>
+                    <ng-icon class="text-3xl text-white mx-2" name="heroTrophy"></ng-icon>
+                </div>
+            </div>
+        </dialog>
     </div>
 </div>
