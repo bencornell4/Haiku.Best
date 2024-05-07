@@ -10,7 +10,7 @@ import { heroBars3, heroQuestionMarkCircle, heroTrophy, heroCog6Tooth, heroXCirc
     selector: 'app-hello-world',
     templateUrl: './hello-world.component.html',
     imports: [FormsModule, CommonModule, NgIconComponent],
-    viewProviders: [provideIcons({ heroBars3, heroQuestionMarkCircle, heroTrophy, heroCog6Tooth, heroXCircle, heroShare})],
+    viewProviders: [provideIcons({ heroBars3, heroQuestionMarkCircle, heroTrophy, heroXCircle, heroShare})],
 })
 
 @Injectable({
