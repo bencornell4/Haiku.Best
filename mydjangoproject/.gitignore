@@ -1,4 +1,5 @@
 
 .env
+/mydjangoproject/__pycache__
 
 
