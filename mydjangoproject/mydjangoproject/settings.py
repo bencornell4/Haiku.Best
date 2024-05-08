@@ -29,6 +29,7 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', cast=bool)
 
 ALLOWED_HOSTS = [
+    'server.haiku.best',
     'haiku-best.onrender.com',
     'localhost'
 ]

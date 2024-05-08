@@ -7,7 +7,7 @@ import { NgxSpinnerService } from "ngx-spinner";
 import { CommonModule } from "@angular/common";
 import { NgxSpinnerModule } from 'ngx-spinner';
 
-var serverUrl = 'https://haiku-best.onrender.com/'
+var serverUrl = 'https://server.haiku.best/'
 if (isDevMode()) {
     serverUrl = 'http://localhost:8000/'
 }
