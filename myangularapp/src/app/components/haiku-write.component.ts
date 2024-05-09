@@ -58,8 +58,8 @@ export class HaikuWriteComponent {
             this.spinner.hide("spinnerStart");
             isLoaded = true;
             if(response['alreadySubmitted']) {
-                this.score = response['lastScore'];
-                this.percentile = response['lastPercentile'];
+                this.score = 0 //response['lastScore'];
+                this.percentile = 0 //response['lastPercentile'];
                 this.limitDialog.nativeElement.open = true;
                 this.infoDialog.nativeElement.open = false;
             }
