@@ -54,7 +54,7 @@ def haiku_judge(request):
         accuracy = 1
         haiku_category = "Haiku"
         #prompt
-        prompt_instructions = 'Rate the following Haiku on a scale of 0-10, please only respond with the number and nothing else.  Please use decimals to two decimal places.  A category will also be supplied that the Haiku should somewhat adhere to.  Do your best to be as consistent as possible so that if I were to give you this Haiku again, you would give it the same score.  Please rate critically because only a truly amazing Haiku should get a high score.  Lastly, here is a rubric: 0-3: does not follow the category or does not resemble a haiku.  3-5: a below average piece of poetry, about as good as poems found in a highschool poetry class. 5-7: passable poetry, about as good as poems found in a college poetry class.  7-9: a poem that could be published.  9-10: as good as any poem ever written, maybe better. Thank you in advance for your rating. The category of the Haiku is: ' + haiku_category
+        prompt_instructions = 'Rate the following Haiku on a scale of 0-10 using decimals, please only respond with the number and nothing else.  A category will also be supplied that the Haiku should somewhat adhere to.  Please rate critically because only a truly amazing Haiku should get a high score.  Lastly, here is a rubric: 0-3: does not follow the category or does not resemble a haiku.  3-5: a below average piece of poetry, about as good as poems found in a highschool poetry class. 5-7: passable poetry, about as good as poems found in a college poetry class.  7-9: a poem that could be published.  9-10: as good as any poem ever written, maybe better. Thank you in advance for your rating. The category of the Haiku is: ' + haiku_category
         #back to normal
         prompt_haiku = 'And the Haiku is: ' + haiku_content
         #initialize ollama post
@@ -75,19 +75,27 @@ def haiku_judge(request):
             sum += float(result['choices'][0]['message']['content'])
         #create postgreSQL entry
         haiku = Haiku.objects.create(content=haiku_content, score=sum / accuracy, author=author)
+        
         #generate score percentile
-        haiku_percentile = Haiku.objects.annotate(
-            percentile=Window(
+        haikus_by_percentile = Haiku.objects.annotate(
+            percentile_rank=Window(
                 expression=PercentRank(),
-                order_by=F('score').asc()
+                order_by=F('score').desc()
             )
-        ).get(id=haiku.id).percentile
-        percentile_score = round(haiku_percentile * 100, 2)
+        )
+
+        # Find the percentile rank of the current haiku within the context of all haikus
+        for item in haikus_by_percentile:
+            if item.id == haiku.id:
+                percentile_score = round(item.percentile_rank * 100, 2)
+                break
+
+        # Convert percentile rank to percentage for display
         #store session data
         print('Successfully reviewed poem: ' + str(haiku.score))
         request.session['last_haiku_judge_date'] = timezone.localdate().isoformat()
-        request.session['last_haiku_judge_score'] = haiku.score
-        request.session['last_haiku_judge_percentile'] = percentile_score
+        request.session['last_haiku_judge_score'] = str(haiku.score)
+        request.session['last_haiku_judge_percentile'] = str(percentile_score)
         request.session.save()
         return Response({'score': haiku.score, 'percentile_score': percentile_score}, status=201)
     return Response({'error': 'Invalid JSON'}, status=400)

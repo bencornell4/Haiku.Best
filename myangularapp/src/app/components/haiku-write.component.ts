@@ -58,8 +58,8 @@ export class HaikuWriteComponent {
             this.spinner.hide("spinnerStart");
             isLoaded = true;
             if(response['alreadySubmitted']) {
-                this.score = 0 //response['lastScore'];
-                this.percentile = 0 //response['lastPercentile'];
+                this.score = response['lastScore'];
+                this.percentile = response['lastPercentile'];
                 this.limitDialog.nativeElement.open = true;
                 this.infoDialog.nativeElement.open = false;
             }
@@ -72,13 +72,11 @@ export class HaikuWriteComponent {
             this.http.get(serverUrl + "api/haikutop/")
             .subscribe((response: any) => {
                 this.haikus.forEach((element: any, index) => {
-                    console.log(element);
                     element[0] = response[index]['content'];
                     element[1] = response[index]['author'];
                     element[2] = response[index]['score'];
                     this.spinner.hide("spinnerMain");
                 });
-                console.log(this.haikus);
                 this.leaderDialog.nativeElement.open = true;
             });
         } else {
@@ -99,7 +97,7 @@ export class HaikuWriteComponent {
                     this.spinner.hide("spinnerMain");
                 } else {
                     this.score = response.score;
-                    this.percentile = response.percentile;
+                    this.percentile = response.percentile_score;
                     this.scoreDialog.nativeElement.open = true;
                     this.spinner.hide("spinnerMain");
                 }
