@@ -1,4 +1,4 @@
-<div class="overflow-hidden h-screen">
+<div class="overflow-hidden">
     <ngx-spinner bdColor = "rgba(0, 0, 0, 0.8)" size = "medium" color = "#fff" type="triangle-skew-spin" [fullScreen] = "true" name="spinnerMain"></ngx-spinner>
     <div class="flex justify-between items-center px-4 h-16 top-0 left-0 mx-auto container">
         <div class="flex items-center">
@@ -23,72 +23,82 @@
         </button>
         <textarea [(ngModel)]="author" rows="1" class="border p-2 mb-4 mt-4 text-center" placeholder="Your Signature"></textarea>
         
-        <dialog closed class="w-80 md:w-96 m-auto bg-slate-400 rounded-md" #scoreDialog>
-            <button (click)="scoreDialog.open = false" title="close-score">
-                <ng-icon class="absolute text-white text-2xl m-2 right-0 top-0" name="heroXCircle"></ng-icon>
-            </button>
-            <div *ngIf="score !== null" class="flex=col mt-4">
-                <p class="text-white text-base text-center m-auto mt-10">the judge has given you a</p>
-                <h2 class="text-xl font-bold mt-4 text-white text-center m-auto">{{ score }} / 10</h2>
-                <div class="flex justify-center mt-14 pb-10">
-                    <ng-icon class="text-3xl text-white mx-2" name="heroShare"></ng-icon>
-                    <button (click)="getTopHaiku()" title="close-score"></button>
+        <dialog closed class="open:flex top-0 h-screen w-full z-10 bg-slate-400 bg-opacity-55 rounded-md" #scoreDialog>
+            <div class="relative w-80 md:w-96 m-auto bg-slate-400 rounded-md">
+                <button (click)="scoreDialog.open = false" title="close-score">
+                    <ng-icon class="absolute text-white text-2xl m-2 right-0 top-0" name="heroXCircle"></ng-icon>
+                </button>
+                <div *ngIf="score !== null" class="flex=col mt-4">
+                    <p class="text-white text-base text-center m-auto mt-10">the judge has given you a</p>
+                    <h2 class="text-xl font-bold mt-4 text-white text-center m-auto">{{ score }} / 10</h2>
+                    <div class="flex justify-center mt-14 pb-10">
+                        <ng-icon class="text-3xl text-white mx-2" name="heroShare"></ng-icon>
+                        <button (click)="getTopHaiku()" title="close-score"></button>
+                            <ng-icon class="text-3xl text-white mx-2" name="heroTrophy"></ng-icon>
+                    </div>
+                </div>
+            </div>
+        </dialog>
+
+        <dialog closed class="open:flex top-0 h-full w-full z-10 bg-slate-400 bg-opacity-55 rounded-md" #leaderDialog>
+            <div class="relative w-80 md:w-96 m-auto bg-slate-400 rounded-md pb-10">
+                <button (click)="leaderDialog.open = false" title="close-score">
+                    <ng-icon class="absolute text-white text-2xl m-2 right-0 top-0" name="heroXCircle"></ng-icon>
+                </button>
+                <p class="text-white font-bold text-sm text-center m-auto mt-8 mx-8">#1</p>
+                <p class="text-white text-sm text-center m-auto mt-4 whitespace-pre-line mx-8">{{haikus[0][0]}}</p>
+                <p class="text-white font-bold text-sm text-center m-auto mt-4 mx-8">{{haikus[0][1]}}, {{haikus[0][2]}}/10</p>
+                <p class="text-white font-bold text-sm text-center m-auto mt-8 mx-8">#2</p>
+                <p class="text-white text-sm text-center m-auto mt-4 whitespace-pre-line mx-8">{{haikus[1][0]}}</p>
+                <p class="text-white font-bold text-sm text-center m-auto mt-4 mx-8">{{haikus[1][1]}}, {{haikus[1][2]}}/10</p>
+                <p class="text-white font-bold text-sm text-center m-auto mt-8 mx-8">#3</p>
+                <p class="text-white text-sm text-center m-auto mt-4 whitespace-pre-line mx-8">{{haikus[2][0]}}</p>
+                <p class="text-white font-bold text-sm text-center m-auto mt-4 mx-8">{{haikus[2][1]}}, {{haikus[2][2]}}/10</p>
+            </div>    
+        </dialog>
+
+        <dialog closed class="open:flex top-0 h-full w-full z-10 bg-slate-400 bg-opacity-55 rounded-md" #limitDialog>
+            <div class="relative w-80 md:w-96 m-auto bg-slate-400 rounded-md pb-10">
+                <button (click)="limitDialog.open = false" title="close-score">
+                    <ng-icon class="absolute text-white text-2xl m-2 right-0 top-0" name="heroXCircle"></ng-icon>
+                </button>
+                <p class="text-white text-base text-bold leading-none text-center m-auto mt-10 whitespace-pre-line mx-8">You may only submit one Haiku each day.</p>
+                <div *ngIf="score !== null" class="flex=col mt-4">
+                    <p class="text-white text-base text-center m-auto mt-10">the judge has gave you a</p>
+                    <h2 class="text-xl font-bold mt-4 text-white text-center m-auto">{{ score }} / 10</h2>
+                    <p class="text-white text-base text-center m-auto mt-4">top {{ percentile }}% of Haikus of all time</p>
+                    <div class="flex justify-center mt-14 pb-10">
+                        <ng-icon class="text-3xl text-white mx-2" name="heroShare"></ng-icon>
                         <ng-icon class="text-3xl text-white mx-2" name="heroTrophy"></ng-icon>
+                    </div>
                 </div>
             </div>
         </dialog>
 
-        <dialog closed class="w-80 md:w-96 m-auto bg-slate-400 rounded-md pb-10" #leaderDialog>
-            <button (click)="leaderDialog.open = false" title="close-score">
-                <ng-icon class="absolute text-white text-2xl m-2 right-0 top-0" name="heroXCircle"></ng-icon>
-            </button>
-            <p class="text-white font-bold text-sm text-center m-auto mt-8 mx-8">#1</p>
-            <p class="text-white text-sm text-center m-auto mt-4 whitespace-pre-line mx-8">{{haikus[0][0]}}</p>
-            <p class="text-white font-bold text-sm text-center m-auto mt-4 mx-8">{{haikus[0][1]}}, {{haikus[0][2]}}/10</p>
-            <p class="text-white font-bold text-sm text-center m-auto mt-8 mx-8">#2</p>
-            <p class="text-white text-sm text-center m-auto mt-4 whitespace-pre-line mx-8">{{haikus[1][0]}}</p>
-            <p class="text-white font-bold text-sm text-center m-auto mt-4 mx-8">{{haikus[1][1]}}, {{haikus[1][2]}}/10</p>
-            <p class="text-white font-bold text-sm text-center m-auto mt-8 mx-8">#3</p>
-            <p class="text-white text-sm text-center m-auto mt-4 whitespace-pre-line mx-8">{{haikus[2][0]}}</p>
-            <p class="text-white font-bold text-sm text-center m-auto mt-4 mx-8">{{haikus[2][1]}}, {{haikus[2][2]}}/10</p>
-        </dialog>
-
-        <dialog closed class="w-80 md:w-96 m-auto bg-slate-400 rounded-md pb-10" #limitDialog>
-            <button (click)="limitDialog.open = false" title="close-score">
-                <ng-icon class="absolute text-white text-2xl m-2 right-0 top-0" name="heroXCircle"></ng-icon>
-            </button>
-            <p class="text-white text-base text-bold leading-none text-center m-auto mt-10 whitespace-pre-line mx-8">You may only submit one Haiku each day.</p>
-            <div *ngIf="score !== null" class="flex=col mt-4">
-                <p class="text-white text-base text-center m-auto mt-10">the judge has gave you a</p>
-                <h2 class="text-xl font-bold mt-4 text-white text-center m-auto">{{ score }} / 10</h2>
-                <p class="text-white text-base text-center m-auto mt-4">top {{ percentile }}% of Haikus of all time</p>
-                <div class="flex justify-center mt-14 pb-10">
-                    <ng-icon class="text-3xl text-white mx-2" name="heroShare"></ng-icon>
-                    <ng-icon class="text-3xl text-white mx-2" name="heroTrophy"></ng-icon>
-                </div>
+        <dialog open class="open:flex top-0 h-full w-full z-10 bg-slate-400 bg-opacity-55 rounded-md" #infoDialog>
+            <div class="relative w-80 md:w-96 m-auto bg-slate-400 rounded-md pb-10">
+                <button (click)="infoDialog.open = false" title="close info">
+                    <ng-icon class="absolute text-white text-2xl m-2 right-0 top-0" name="heroXCircle"></ng-icon>
+                </button>
+                <p class="text-white text-base leading-none text-center m-auto mt-10 mx-8">Write a Haiku, sign it, and submit it for review from the judge.</p>
+                <p class="text-white text-base leading-none text-center m-auto mt-4 mx-8">You may write one Haiku per day.</p>
+                <button (click)="infoDialog.open = false" class="bg--500 bg-indigo-400 hover:bg-indigo-500 text-white font-bold py-2 px-4 mt-10 rounded flex m-auto">
+                    OK
+                </button>
             </div>
         </dialog>
 
-        <dialog open class="w-80 md:w-96 m-auto bg-slate-400 rounded-md pb-10" #infoDialog>
-            <button (click)="infoDialog.open = false" title="close info">
-                <ng-icon class="absolute text-white text-2xl m-2 right-0 top-0" name="heroXCircle"></ng-icon>
-            </button>
-            <p class="text-white text-base leading-none text-center m-auto mt-10 mx-8">Write a Haiku, sign it, and submit it for review from the judge.</p>
-            <p class="text-white text-base leading-none text-center m-auto mt-4 mx-8">You may write one Haiku per day.</p>
-            <button (click)="infoDialog.open = false" class="bg--500 bg-indigo-400 hover:bg-indigo-500 text-white font-bold py-2 px-4 mt-10 rounded flex m-auto">
-                OK
-            </button>
-        </dialog>
-
-        <dialog closed class="w-80 md:w-96 m-auto bg-slate-400 rounded-md pb-10" #warningDialog>
-            <button (click)="warningDialog.open = false" title="close info">
-                <ng-icon class="absolute text-white text-2xl m-2 right-0 top-0" name="heroXCircle"></ng-icon>
-            </button>
-            <p class="text-white text-base leading-none text-center m-auto mt-10 mx-8">The server is spinning up and takes about 40 seconds.</p>
-            <p class="text-white text-base leading-none text-center m-auto mt-4 mx-8">This saves me money :)</p>
-            <button (click)="warningDialog.open = false" class="bg--500 bg-indigo-400 hover:bg-indigo-500 text-white font-bold py-2 px-4 mt-10 rounded flex m-auto">
-                OK
-            </button>
+        <dialog closed class="open:flex top-0 h-full w-full z-10 bg-slate-400 bg-opacity-55 rounded-md" #warningDialog>
+            <div class="relative w-80 md:w-96 m-auto bg-slate-400 rounded-md pb-10">
+                <button (click)="warningDialog.open = false" title="close info">
+                    <ng-icon class="absolute text-white text-2xl m-2 right-0 top-0" name="heroXCircle"></ng-icon>
+                </button>
+                <p class="text-white text-base leading-none text-center m-auto mt-10 mx-8">The server is spinning up and takes about 40 seconds.</p>
+                <p class="text-white text-base leading-none text-center m-auto mt-4 mx-8">This saves me money :)</p>
+                <button (click)="warningDialog.open = false" class="bg--500 bg-indigo-400 hover:bg-indigo-500 text-white font-bold py-2 px-4 mt-10 rounded flex m-auto">
+                    OK
+                </button>
+            </div>
         </dialog>
     </div>
 </div>
