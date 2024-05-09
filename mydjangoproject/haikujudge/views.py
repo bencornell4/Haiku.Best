@@ -5,6 +5,9 @@ from django.shortcuts import render
 from django.utils import timezone
 from django.core.serializers.json import DjangoJSONEncoder
 
+from django.db.models import Window, F
+from django.db.models.functions import PercentRank
+
 from rest_framework import status
 from rest_framework.parsers import JSONParser
 
@@ -20,9 +23,14 @@ llama = LlamaAPI(config('LLAMA_API'))
 
 # Create your views here.
 
-@api_view(['HEAD'])
+@api_view(['GET'])
 def haiku_head(request):
-    return Response({'success': True}, status=201)
+    last_action_date = request.session.get('last_haiku_judge_date', None)
+    last_action_score = request.session.get('last_haiku_judge_score', None)
+    last_action_percentile = request.session.get('last_haiku_judge_percentile', None)
+    if last_action_date and last_action_date == timezone.localdate().isoformat():
+        return Response({'alreadySubmitted': True, 'lastScore': last_action_score, 'lastPercentile': last_action_percentile}, status=201)
+    return Response({'alreadySubmitted': False}, status=201)
 
 @api_view(['GET'])
 def haiku_top(request):
@@ -34,8 +42,6 @@ def haiku_top(request):
 def haiku_judge(request):
     # Check if the action has already been performed today
     last_action_date = request.session.get('last_haiku_judge_date', None)
-    print(last_action_date)
-    print(timezone.localdate())
     if last_action_date and last_action_date == timezone.localdate().isoformat():
         return Response({'message': 'one haiku a day'}, status=201)
     #extract haiku
@@ -69,8 +75,19 @@ def haiku_judge(request):
             sum += float(result['choices'][0]['message']['content'])
         #create postgreSQL entry
         haiku = Haiku.objects.create(content=haiku_content, score=sum / accuracy, author=author)
+        #generate score percentile
+        haiku_percentile = Haiku.objects.annotate(
+            percentile=Window(
+                expression=PercentRank(),
+                order_by=F('score').asc()
+            )
+        ).get(id=haiku.id).percentile
+        percentile_score = round(haiku_percentile * 100, 2)
+        #store session data
         print('Successfully reviewed poem: ' + str(haiku.score))
         request.session['last_haiku_judge_date'] = timezone.localdate().isoformat()
+        request.session['last_haiku_judge_score'] = haiku.score
+        request.session['last_haiku_judge_percentile'] = percentile_score
         request.session.save()
-        return Response({'score': haiku.score}, status=201)
+        return Response({'score': haiku.score, 'percentile_score': percentile_score}, status=201)
     return Response({'error': 'Invalid JSON'}, status=400)

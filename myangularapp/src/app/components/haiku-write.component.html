@@ -1,25 +1,29 @@
 <div class="overflow-hidden h-screen">
-    <ngx-spinner bdColor = "rgba(0, 0, 0, 0.8)" size = "medium" color = "#fff" type="triangle-skew-spin" [fullScreen] = "true"></ngx-spinner>
+    <ngx-spinner bdColor = "rgba(0, 0, 0, 0.8)" size = "medium" color = "#fff" type="triangle-skew-spin" [fullScreen] = "true" name="spinnerMain"></ngx-spinner>
     <div class="flex justify-between items-center px-4 h-16 top-0 left-0 mx-auto container">
         <div class="flex items-center">
             <h2 class="text-xl *:inline-flex mx-2">haiku.best</h2>
         </div>
         <div>
-            <ng-icon class="text-3xl mx-2" name="heroQuestionMarkCircle"></ng-icon>
-            <button (click)="getTopHaiku()" title="close-score">
-                <ng-icon class="text-3xl mx-2" name="heroTrophy"></ng-icon>            </button>
+            <button (click)="infoDialog.open = true" title="info button">
+                <ng-icon class="text-3xl mx-2" name="heroQuestionMarkCircle"></ng-icon>            
+            </button>
+            <button (click)="getTopHaiku()" title="leaderboard button" class="relative">
+                <ng-icon class="text-3xl mx-2" name="heroTrophy"></ng-icon>        
+            </button>
         </div>
     </div>
     <div class="flex flex-col mt-20 justify-center items-center">
         <textarea [(ngModel)]="line1" rows="1" class="border p-2 mb-4 mt-4 text-center" placeholder="First Line"></textarea>
         <textarea [(ngModel)]="line2" rows="1" class="border p-2 mb-4 text-center" placeholder="Second Line"></textarea>
         <textarea [(ngModel)]="line3" rows="1" class="border p-2 mb-4 text-center" placeholder="Third Line"></textarea>
-        <button (click)="submitHaiku()" class="bg--500 bg-indigo-400 hover:bg-indigo-500 text-white font-bold py-2 px-4 mt-10 rounded">
+        <button (click)="submitHaiku()" class="relative bg--500 bg-indigo-400 hover:bg-indigo-500 text-white font-bold py-2 px-4 mt-10 rounded">
             Submit Haiku
+            <ngx-spinner [zIndex]="0" bdColor = "rgba(0, 0, 0, 0.5)" size = "small" color = "#fff" type="ball-spin" [fullScreen]="false" name="spinnerStart"></ngx-spinner>
         </button>
         <textarea [(ngModel)]="author" rows="1" class="border p-2 mb-4 mt-4 text-center" placeholder="Your Signature"></textarea>
         
-        <dialog closed class="w-[70%] sm:w-[50%] m-auto bg-slate-400 rounded-md" #scoreDialog>
+        <dialog closed class="w-80 md:w-96 m-auto bg-slate-400 rounded-md" #scoreDialog>
             <button (click)="scoreDialog.open = false" title="close-score">
                 <ng-icon class="absolute text-white text-2xl m-2 right-0 top-0" name="heroXCircle"></ng-icon>
             </button>
@@ -28,24 +32,63 @@
                 <h2 class="text-xl font-bold mt-4 text-white text-center m-auto">{{ score }} / 10</h2>
                 <div class="flex justify-center mt-14 pb-10">
                     <ng-icon class="text-3xl text-white mx-2" name="heroShare"></ng-icon>
+                    <button (click)="getTopHaiku()" title="close-score"></button>
+                        <ng-icon class="text-3xl text-white mx-2" name="heroTrophy"></ng-icon>
+                </div>
+            </div>
+        </dialog>
+
+        <dialog closed class="w-80 md:w-96 m-auto bg-slate-400 rounded-md pb-10" #leaderDialog>
+            <button (click)="leaderDialog.open = false" title="close-score">
+                <ng-icon class="absolute text-white text-2xl m-2 right-0 top-0" name="heroXCircle"></ng-icon>
+            </button>
+            <p class="text-white font-bold text-sm text-center m-auto mt-8 mx-8">#1</p>
+            <p class="text-white text-sm text-center m-auto mt-4 whitespace-pre-line mx-8">{{haikus[0][0]}}</p>
+            <p class="text-white font-bold text-sm text-center m-auto mt-4 mx-8">{{haikus[0][1]}}, {{haikus[0][2]}}/10</p>
+            <p class="text-white font-bold text-sm text-center m-auto mt-8 mx-8">#2</p>
+            <p class="text-white text-sm text-center m-auto mt-4 whitespace-pre-line mx-8">{{haikus[1][0]}}</p>
+            <p class="text-white font-bold text-sm text-center m-auto mt-4 mx-8">{{haikus[1][1]}}, {{haikus[1][2]}}/10</p>
+            <p class="text-white font-bold text-sm text-center m-auto mt-8 mx-8">#3</p>
+            <p class="text-white text-sm text-center m-auto mt-4 whitespace-pre-line mx-8">{{haikus[2][0]}}</p>
+            <p class="text-white font-bold text-sm text-center m-auto mt-4 mx-8">{{haikus[2][1]}}, {{haikus[2][2]}}/10</p>
+        </dialog>
+
+        <dialog closed class="w-80 md:w-96 m-auto bg-slate-400 rounded-md pb-10" #limitDialog>
+            <button (click)="limitDialog.open = false" title="close-score">
+                <ng-icon class="absolute text-white text-2xl m-2 right-0 top-0" name="heroXCircle"></ng-icon>
+            </button>
+            <p class="text-white text-base text-bold leading-none text-center m-auto mt-10 whitespace-pre-line mx-8">You may only submit one Haiku each day.</p>
+            <div *ngIf="score !== null" class="flex=col mt-4">
+                <p class="text-white text-base text-center m-auto mt-10">the judge has gave you a</p>
+                <h2 class="text-xl font-bold mt-4 text-white text-center m-auto">{{ score }} / 10</h2>
+                <p class="text-white text-base text-center m-auto mt-4">top {{ percentile }}% of Haikus of all time</p>
+                <div class="flex justify-center mt-14 pb-10">
+                    <ng-icon class="text-3xl text-white mx-2" name="heroShare"></ng-icon>
                     <ng-icon class="text-3xl text-white mx-2" name="heroTrophy"></ng-icon>
                 </div>
             </div>
         </dialog>
 
-        <dialog closed class="w-[70%] sm:w-[50%] m-auto bg-slate-400 rounded-md pb-10" #leaderDialog>
-            <button (click)="leaderDialog.open = false" title="close-score">
+        <dialog open class="w-80 md:w-96 m-auto bg-slate-400 rounded-md pb-10" #infoDialog>
+            <button (click)="infoDialog.open = false" title="close info">
                 <ng-icon class="absolute text-white text-2xl m-2 right-0 top-0" name="heroXCircle"></ng-icon>
             </button>
-            <p class="text-white text-base leading-none text-center m-auto mt-10 whitespace-pre-line">{{haiku1[0]}}</p>
-            <p class="text-white font-bold text-base text-center m-auto mt-7">{{haiku1[1]}}, {{haiku1[2]}}/10</p>
+            <p class="text-white text-base leading-none text-center m-auto mt-10 mx-8">Write a Haiku, sign it, and submit it for review from the judge.</p>
+            <p class="text-white text-base leading-none text-center m-auto mt-4 mx-8">You may write one Haiku per day.</p>
+            <button (click)="infoDialog.open = false" class="bg--500 bg-indigo-400 hover:bg-indigo-500 text-white font-bold py-2 px-4 mt-10 rounded flex m-auto">
+                OK
+            </button>
         </dialog>
 
-        <dialog closed class="w-[70%] sm:w-[50%] m-auto bg-slate-400 rounded-md pb-10" #limitDialog>
-            <button (click)="limitDialog.open = false" title="close-score">
+        <dialog closed class="w-80 md:w-96 m-auto bg-slate-400 rounded-md pb-10" #warningDialog>
+            <button (click)="warningDialog.open = false" title="close info">
                 <ng-icon class="absolute text-white text-2xl m-2 right-0 top-0" name="heroXCircle"></ng-icon>
             </button>
-            <p class="text-white text-base leading-none text-center m-auto mt-10 whitespace-pre-line px-4">You may only submit one Haiku each day.</p>
+            <p class="text-white text-base leading-none text-center m-auto mt-10 mx-8">The server is spinning up and takes about 40 seconds.</p>
+            <p class="text-white text-base leading-none text-center m-auto mt-4 mx-8">This saves me money :)</p>
+            <button (click)="warningDialog.open = false" class="bg--500 bg-indigo-400 hover:bg-indigo-500 text-white font-bold py-2 px-4 mt-10 rounded flex m-auto">
+                OK
+            </button>
         </dialog>
     </div>
 </div>
