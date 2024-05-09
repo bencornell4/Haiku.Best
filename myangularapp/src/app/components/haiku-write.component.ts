@@ -39,6 +39,7 @@ export class HaikuWriteComponent {
     line1: string = '';
     line2: string = '';
     line3: string = '';
+    lastHaiku: string = '';
     author: string = '';
     score: number = 0;
     percentile: number = 0;
@@ -62,6 +63,7 @@ export class HaikuWriteComponent {
             if(response['alreadySubmitted']) {
                 this.score = response['lastScore'];
                 this.percentile = response['lastPercentile'];
+                this.lastHaiku = response['lastHaiku'];
                 this.limitDialog.nativeElement.open = true;
                 this.infoDialog.nativeElement.open = false;
             }

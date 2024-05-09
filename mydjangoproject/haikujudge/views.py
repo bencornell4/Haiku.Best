@@ -28,8 +28,9 @@ def haiku_head(request):
     last_action_date = request.session.get('last_haiku_judge_date', None)
     last_action_score = request.session.get('last_haiku_judge_score', None)
     last_action_percentile = request.session.get('last_haiku_judge_percentile', None)
+    last_action_haiku = request.session.get('last_haiku_judge_haiku', None)
     if last_action_date and last_action_date == timezone.localdate().isoformat():
-        return Response({'alreadySubmitted': True, 'lastScore': last_action_score, 'lastPercentile': last_action_percentile}, status=201)
+        return Response({'alreadySubmitted': True, 'lastScore': last_action_score, 'lastPercentile': last_action_percentile, 'lastHaiku': last_action_haiku}, status=201)
     return Response({'alreadySubmitted': False}, status=201)
 
 @api_view(['GET'])
@@ -40,25 +41,17 @@ def haiku_top(request):
 
 @api_view(['POST'])
 def haiku_judge(request):
-    print(0.3)
     data = JSONParser().parse(request)
-    print(data)
-    print(0.4)
     # Check if the action has already been performed today
     last_action_date = request.session.get('last_haiku_judge_date', None)
-    print(0.5)
     if last_action_date and last_action_date == timezone.localdate().isoformat():
         return Response({'message': 'one haiku a day'}, status=201)
     #extract haiku
     #data = JSONParser().parse(request)
     haiku_serializer = HaikuSerializer(data=data)
-    print(0.6)
     if haiku_serializer.is_valid():
-        print(0.7)
         haiku_content = haiku_serializer.validated_data.get('content', '')
-        print(0.8)
-        author = haiku_serializer.validated_data.get('author', '')      
-        print(0.9)      
+        author = haiku_serializer.validated_data.get('author', '')  
         #params
         accuracy = 1
         haiku_category = "Haiku"
@@ -68,7 +61,6 @@ def haiku_judge(request):
         prompt_haiku = 'And the Haiku is: ' + haiku_content
         #initialize ollama post
         sum = 0
-        print(1)
         llama_request_json = {
             'model': 'llama3-70b',
             'messages': [
@@ -80,11 +72,8 @@ def haiku_judge(request):
         #run multiple times and average for consistency
         for i in range(accuracy):
             #post to ollama
-            print("test")
             llama_response = llama.run(llama_request_json)
-            print("test2")
             result = llama_response.json()
-            print("result")
             sum += float(result['choices'][0]['message']['content'])
         #create postgreSQL entry
         haiku = Haiku.objects.create(content=haiku_content, score=sum / accuracy, author=author)
@@ -109,6 +98,7 @@ def haiku_judge(request):
         request.session['last_haiku_judge_date'] = timezone.localdate().isoformat()
         request.session['last_haiku_judge_score'] = str(haiku.score)
         request.session['last_haiku_judge_percentile'] = str(percentile_score)
+        request.session['last_haiku_judge_haiku'] = haiku_content
         request.session.save()
         return Response({'score': haiku.score, 'percentile_score': percentile_score}, status=201)
     return Response({'error': 'Invalid JSON'}, status=400)
