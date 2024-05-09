@@ -70,8 +70,11 @@ def haiku_judge(request):
         #run multiple times and average for consistency
         for i in range(accuracy):
             #post to ollama
+            print("test")
             llama_response = llama.run(llama_request_json)
+            print("test2")
             result = llama_response.json()
+            print("result")
             sum += float(result['choices'][0]['message']['content'])
         #create postgreSQL entry
         haiku = Haiku.objects.create(content=haiku_content, score=sum / accuracy, author=author)
