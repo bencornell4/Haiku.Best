@@ -34,6 +34,7 @@ export class HaikuWriteComponent {
     @ViewChild('limitDialog') limitDialog!: ElementRef;
     @ViewChild('infoDialog') infoDialog!: ElementRef;
     @ViewChild('warningDialog') warningDialog!: ElementRef;
+    @ViewChild('entryDialog') entryDialog!: ElementRef;
     line1: string = '';
     line2: string = '';
     line3: string = '';
@@ -70,14 +71,20 @@ export class HaikuWriteComponent {
         if (isLoaded) {
             this.spinner.show("spinnerMain");
             this.http.get(serverUrl + "api/haikutop/")
-            .subscribe((response: any) => {
-                this.haikus.forEach((element: any, index) => {
-                    element[0] = response[index]['content'];
-                    element[1] = response[index]['author'];
-                    element[2] = response[index]['score'];
-                    this.spinner.hide("spinnerMain");
-                });
-                this.leaderDialog.nativeElement.open = true;
+            .subscribe({
+                next: (response: any) => 
+                {
+                    this.haikus.forEach((element: any, index) => {
+                        element[0] = response[index]['content'];
+                        element[1] = response[index]['author'];
+                        element[2] = response[index]['score'];
+                        this.spinner.hide("spinnerMain");
+                    });
+                    this.leaderDialog.nativeElement.open = true;
+                },
+                error: (error) =>
+                {
+                }
             });
         } else {
             this.warningDialog.nativeElement.open = true;
@@ -85,25 +92,33 @@ export class HaikuWriteComponent {
     }
 
     submitHaiku(): void {
-        if (isLoaded) {
+        const fields = [this.line1, this.line2, this.line3, this.author];
+        if (isLoaded && fields.every(field => field !== '')) {
             this.spinner.show("spinnerMain")
             this.http.post(serverUrl + "api/haikujudge/", {
                 content: this.line1 + "\n " + this.line2 + "\n " + this.line3,
                 author: this.author,
                 score: this.score,
-            }, {withCredentials: true}).subscribe((response: any) => {
-                if (response.message) {
-                    this.limitDialog.nativeElement.open = true;
-                    this.spinner.hide("spinnerMain");
-                } else {
-                    this.score = response.score;
-                    this.percentile = response.percentile_score;
-                    this.scoreDialog.nativeElement.open = true;
-                    this.spinner.hide("spinnerMain");
+            }, {withCredentials: true}).subscribe({
+                next: (response: any) => {
+                    if (response.message) {
+                        this.limitDialog.nativeElement.open = true;
+                        this.spinner.hide("spinnerMain");
+                    } else {
+                        this.score = response.score;
+                        this.percentile = response.percentile_score;
+                        this.scoreDialog.nativeElement.open = true;
+                        this.spinner.hide("spinnerMain");
+                    }
+                },
+                error: (error) =>
+                {
                 }
             });
-        } else {
+        } else if (!isLoaded) {
             this.warningDialog.nativeElement.open = true;
+        } else {
+            this.entryDialog.nativeElement.open = true;
         }
     }
 }
