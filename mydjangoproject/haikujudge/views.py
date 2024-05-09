@@ -40,12 +40,14 @@ def haiku_top(request):
 
 @api_view(['POST'])
 def haiku_judge(request):
+    data = JSONParser().parse(request)
+    print(data)
     # Check if the action has already been performed today
     last_action_date = request.session.get('last_haiku_judge_date', None)
     if last_action_date and last_action_date == timezone.localdate().isoformat():
         return Response({'message': 'one haiku a day'}, status=201)
     #extract haiku
-    data = JSONParser().parse(request)
+    #data = JSONParser().parse(request)
     haiku_serializer = HaikuSerializer(data=data)
     if haiku_serializer.is_valid():
         haiku_content = haiku_serializer.validated_data.get('content', '')
