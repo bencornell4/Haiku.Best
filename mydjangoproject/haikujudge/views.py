@@ -40,18 +40,25 @@ def haiku_top(request):
 
 @api_view(['POST'])
 def haiku_judge(request):
+    print(0.3)
     data = JSONParser().parse(request)
     print(data)
+    print(0.4)
     # Check if the action has already been performed today
     last_action_date = request.session.get('last_haiku_judge_date', None)
+    print(0.5)
     if last_action_date and last_action_date == timezone.localdate().isoformat():
         return Response({'message': 'one haiku a day'}, status=201)
     #extract haiku
     #data = JSONParser().parse(request)
     haiku_serializer = HaikuSerializer(data=data)
+    print(0.6)
     if haiku_serializer.is_valid():
+        print(0.7)
         haiku_content = haiku_serializer.validated_data.get('content', '')
-        author = haiku_serializer.validated_data.get('author', '')            
+        print(0.8)
+        author = haiku_serializer.validated_data.get('author', '')      
+        print(0.9)      
         #params
         accuracy = 1
         haiku_category = "Haiku"
@@ -61,6 +68,7 @@ def haiku_judge(request):
         prompt_haiku = 'And the Haiku is: ' + haiku_content
         #initialize ollama post
         sum = 0
+        print(1)
         llama_request_json = {
             'model': 'llama3-70b',
             'messages': [
