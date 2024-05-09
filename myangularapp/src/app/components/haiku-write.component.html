@@ -109,7 +109,19 @@
                     <ng-icon class="absolute text-white text-2xl m-2 right-0 top-0" name="heroXCircle"></ng-icon>
                 </button>
                 <p class="text-white text-base leading-none text-center m-auto mt-10 mx-8">Please fill out all entries.</p>
-                <button (click)="entryDialog.open = false" class="bg--500 bg-indigo-400 hover:bg-indigo-500 text-white font-bold py-2 px-4 mt-10 rounded flex m-auto">
+                <button (click)="entryDialog.open = false" title="ok to entry warnings dialog" class="bg--500 bg-indigo-400 hover:bg-indigo-500 text-white font-bold py-2 px-4 mt-10 rounded flex m-auto">
+                    OK
+                </button>
+            </div>
+        </dialog>
+
+        <dialog closed class="open:flex top-0 h-full w-full z-10 bg-slate-400 bg-opacity-55 rounded-md" #errorDialog>
+            <div class="relative w-80 md:w-96 m-auto bg-slate-400 rounded-md pb-10">
+                <button (click)="errorDialog.open = false" title="close error dialog">
+                    <ng-icon class="absolute text-white text-2xl m-2 right-0 top-0" name="heroXCircle"></ng-icon>
+                </button>
+                <p class="text-white text-base leading-none text-center m-auto mt-10 mx-8">Something went wrong, please try again.</p>
+                <button (click)="errorDialog.open = false" title="ok to error dialog" class="bg--500 bg-indigo-400 hover:bg-indigo-500 text-white font-bold py-2 px-4 mt-10 rounded flex m-auto">
                     OK
                 </button>
             </div>

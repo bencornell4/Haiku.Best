@@ -35,6 +35,7 @@ export class HaikuWriteComponent {
     @ViewChild('infoDialog') infoDialog!: ElementRef;
     @ViewChild('warningDialog') warningDialog!: ElementRef;
     @ViewChild('entryDialog') entryDialog!: ElementRef;
+    @ViewChild('errorDialog') errorDialog!: ElementRef;
     line1: string = '';
     line2: string = '';
     line3: string = '';
@@ -84,6 +85,8 @@ export class HaikuWriteComponent {
                 },
                 error: (error) =>
                 {
+                    this.spinner.hide("spinnerMain");
+                    this.errorDialog.nativeElement.open = true;
                 }
             });
         } else {
@@ -113,6 +116,8 @@ export class HaikuWriteComponent {
                 },
                 error: (error) =>
                 {
+                    this.spinner.hide("spinnerMain")
+                    this.errorDialog.nativeElement.open = true;
                 }
             });
         } else if (!isLoaded) {
