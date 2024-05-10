@@ -113,6 +113,7 @@ export class HaikuWriteComponent {
                         this.score = response.score;
                         this.percentile = response.percentile_score;
                         this.scoreDialog.nativeElement.open = true;
+                        this.lastHaiku = this.line1 + "\n " + this.line2 + "\n " + this.line3;
                         this.spinner.hide("spinnerMain");
                     }
                 },
